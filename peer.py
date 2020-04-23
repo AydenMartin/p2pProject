@@ -2,14 +2,14 @@ import socket
 from tkinter import *
 import tkinter as tk
 import threading
-import difflib
 
 class Application(tk.Frame):
+    global frame
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
         master.title("Peer to Peer gui")
-        frame=Frame(master, width=500, height=500)
+        frame = Frame(master, width=500, height=500)
         frame.pack()
         self.create_widgets(frame)
 
@@ -87,7 +87,12 @@ class peerService:
     counter = 1.0
     def connection(self,frame,ip,port):
         friend = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        friend.connect((ip,port))
+        try:
+            friend.connect((ip,port))
+        except ConnectionRefusedError:
+            print("connection couldnt be established")
+
+        start()
         print('You connected succesfully')
         SENDthread = threading.Thread(target=self.Messaging, args=[frame,friend])
         SENDthread.start()
@@ -109,7 +114,6 @@ class peerService:
         client1.bind((ip, port))
         client1.listen(1)
         friend, addr = client1.accept()
-
         SENDthread = threading.Thread(target=self.Messaging, args=[frame,friend])
         SENDthread.start()
         messages = Text(frame)
@@ -131,9 +135,9 @@ class peerService:
 
     def Messaging(self, frame, friend):
         textSubmit = Entry(frame)
-        textSubmit.place(x=200, y=400, height=50, width=100)
+        textSubmit.place(x=175, y=350, height=50, width=100)
         submit = Button(frame,text="Submit")
-        submit.place(x=150,y=425)
+        submit.place(x=200,y=420)
         submit["command"]=lambda: self.send(friend, textSubmit.get())
         textSubmit.delete(0,END)
 
